@@ -1,11 +1,17 @@
 
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 
+import 'core/constants/app_constants.dart';
 import 'firebase_options.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/task_list_screen.dart';
+import 'services/fcm_service.dart';
+import 'services/notification_service.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +20,28 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
+
+  await NotificationService.instance.initialize(
+    onTap: _handleLocalNotificationTap,
+  );
+
+  await FCMService.instance.initialize(
+    onNotificationTap: _handleFCMNotificationTap,
+  );
+
   runApp(const FirebaseTaskManagerApp());
+}
+
+void _handleLocalNotificationTap(String? payload) {
+  // Task-specific navigation will be connected in the next step.
+  // Payload contains JSON data, including taskId when available.
+}
+
+void _handleFCMNotificationTap(String? taskId) {
+  // Task-specific navigation will be connected in the next step.
 }
 
 class FirebaseTaskManagerApp extends StatelessWidget {
@@ -23,16 +50,17 @@ class FirebaseTaskManagerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Task Manager',
+      navigatorKey: navigatorKey,
+      title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF635BFF),
+          seedColor: AppConstants.primaryColor,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F8FC),
+        scaffoldBackgroundColor: AppConstants.backgroundColor,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFF7F8FC),
+          backgroundColor: AppConstants.backgroundColor,
           elevation: 0,
           centerTitle: false,
         ),
@@ -40,21 +68,27 @@ class FirebaseTaskManagerApp extends StatelessWidget {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(
+              AppConstants.inputRadius,
+            ),
             borderSide: const BorderSide(
-              color: Color(0xFFE5E7EB),
+              color: AppConstants.borderColor,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(
+              AppConstants.inputRadius,
+            ),
             borderSide: const BorderSide(
-              color: Color(0xFFE5E7EB),
+              color: AppConstants.borderColor,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(
+              AppConstants.inputRadius,
+            ),
             borderSide: const BorderSide(
-              color: Color(0xFF635BFF),
+              color: AppConstants.primaryColor,
               width: 1.5,
             ),
           ),

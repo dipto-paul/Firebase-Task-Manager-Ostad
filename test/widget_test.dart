@@ -1,30 +1,30 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:firebase_task_manager/main.dart';
+import 'package:firebase_task_manager/core/enums/task_priority.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('TaskPriority', () {
+    test('should provide the correct labels', () {
+      expect(TaskPriority.low.label, 'Low');
+      expect(TaskPriority.medium.label, 'Medium');
+      expect(TaskPriority.high.label, 'High');
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    test('should provide the correct levels', () {
+      expect(TaskPriority.low.level, 1);
+      expect(TaskPriority.medium.level, 2);
+      expect(TaskPriority.high.level, 3);
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    test('should parse priority strings', () {
+      expect(TaskPriority.fromString('low'), TaskPriority.low);
+      expect(TaskPriority.fromString('HIGH'), TaskPriority.high);
+      expect(TaskPriority.fromString('medium'), TaskPriority.medium);
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('should default to medium for unknown values', () {
+      expect(TaskPriority.fromString('unknown'), TaskPriority.medium);
+      expect(TaskPriority.fromString(null), TaskPriority.medium);
+    });
   });
 }
