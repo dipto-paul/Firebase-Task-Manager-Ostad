@@ -15,6 +15,7 @@ enum TaskPriority {
     }
   }
 
+
   int get level {
     switch (this) {
       case TaskPriority.low:
